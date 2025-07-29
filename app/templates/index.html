@@ -3,10 +3,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Index</title>
+    <title>Evaluador de Exámenes</title>
+    <style>
+        body { font-family: sans-serif; margin: 20px; }
+        .upload-section, .results-section { margin-bottom: 30px; padding: 20px; border: 1px solid #ccc; border-radius: 8px; }
+        .results-section { background-color: #f9f9f9; border-color: #eee; }
+        ul { list-style-type: none; padding: 0; }
+        li { margin-bottom: 5px; }
+        .message { padding: 10px; margin-bottom: 15px; border-radius: 5px; }
+        .message.success { background-color: #d4edda; color: #155724; border-color: #c3e6cb; }
+        .message.error { background-color: #f8d7da; color: #721c24; border-color: #f5c6cb; }
+        .nav-link { margin-top: 10px; display: block; }
+    </style>
 </head>
-<body>  
-    <h1>Procesador de Examen</h1>
-    <div><h2>incisos seleccionados: {{results}}</h2></div>
+<body>
+    <h1>Procesador de Examen de Opción Múltiple</h1>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <ul class="flashes">
+                {% for category, message in messages %}
+                    <li class="message {{ category }}">{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+
+    <div class="upload-section">
+        <h2>Paso 1: Generar Coordenadas de Plantilla (Si es un nuevo tipo de hoja)</h2>
+        <p>Si esta es la primera vez que usas este tipo de hoja de examen, o si las coordenadas no se detectan correctamente, primero sube una <strong>hoja de plantilla vacía</strong>. Esto creará el `coords.json` necesario.</p>
+        <a href="{{ url_for('upload_empty_template') }}" class="nav-link">Ir a Subir Plantilla</a>
+    </div>
+
+    <div class="upload-section">
+        <h2>Paso 2: Evaluar Hoja de Examen</h2>
+        <form method="POST" enctype="multipart/form-data">
+            <input type="file" name="file" accept=".jpg, .jpeg, .png, .gif">
+            <input type="submit" value="Evaluar Hoja de Examen">
+        </form>
+        <p>Asegúrate de que ya has generado las coordenadas para este tipo de hoja. Luego, sube tu examen resuelto aquí.</p>
+    </div>
+
+    <div class="results-section" id="results">
+        <h2>Últimos Resultados de Evaluación</h2>
+        <h3>Incisos Seleccionados:</h3>
+        <ul>
+            {% if results %}
+                {% for item in results %}
+                    <li>Pregunta {{ item.pregunta }}: Respuesta **{{ item.respuesta }}**</li>
+                {% endfor %}
+            {% else %}
+                <li>No hay resultados disponibles. Sube una hoja para comenzar.</li>
+            {% endif %}
+        </ul>
+    </div>
 </body>
-</html>
+</html> 
